@@ -348,3 +348,34 @@ def deltaMemory(start_memory, stop_memory):
     memory_diff = stop_memory.compare_to(start_memory, "filename")
     delta_memory = sum(stat.size_diff for stat in memory_diff) / 1024.0
     return delta_memory
+
+def find_slot(map,key,hash_value):
+   first_avail = None
+   found = False
+   ocupied = False
+   while not found:
+      if is_available(map["table"], hash_value):
+            if first_avail is None:
+               first_avail = hash_value
+            entry = al.get_element(map["table"], hash_value)
+            if sp.get_key(entry) is None:
+               found = True
+      elif default_compare(key,sp.get_element(map["table"], hash_value)) == 0:
+            first_avail = hash_value
+            found = True
+            ocupied = True
+      hash_value = (hash_value + 1) % map["capacity"]
+   return ocupied, first_avail
+def is_available(table, pos):
+
+   entry = al.get_element(table, pos)
+   if sp.get_key(entry) is None or sp.get_key(entry) == "__EMPTY__":
+      return True
+   return False
+def default_compare(key, entry):
+
+   if key == sp.get_key(entry):
+      return 0
+   elif key > sp.get_key(entry):
+      return 1
+   return -1
