@@ -1,4 +1,5 @@
 import map_functions as mf
+import random
 from DataStructures.List import array_list as al
 from DataStructures.Map import map_separate_chaining as sp
 def new_map (num_elements, load_factor, prime=109345121):
@@ -6,16 +7,54 @@ def new_map (num_elements, load_factor, prime=109345121):
     mapa = {
         'prime': prime,
         'capacity': mf.next_prime(num_elements / load_factor),
-        'scale': ,
-        'shift': 0,
+        'scale': random.randint(1, prime - 1),
+        'shift': random.randint(0, prime - 1),
         'table': {
             'size': 0,
             'elements': [
                 
             ]
         }
-    }
 
+            },
+        'current_factor': 0,
+        'limit_factor': load_factor,
+        'size': 0     
+    }
+    
+    for i in range(mapa['capacity']):
+        diccionario = {
+            ''
+        }
+    }
+    
+def get(mapa, key):
+    
+    """
+    Recibe un mapa y una llave, y retorna el valor asociado a la llave.
+    
+    """
+    index = mf.hash_value(mapa, key)
+    table = mapa['table']['elements']
+    while table[index] is not None:
+        if table[index][0] == key:
+            return table[index][1]
+        index = (index + 1) % mapa['capacity']
+    return None
+
+def remove(mapa, key):
+    """
+    Recibe un mapa y una llave, y elimina la entrada asociada a la llave.
+    
+    """
+    index = mf.hash_value(mapa, key)
+    table = mapa['table']['elements']
+    while table[index] is not None:
+        if table[index][0] == key:
+            table[index] = None
+            mapa['table']['size'] -= 1
+            return
+        index = (index + 1) % mapa['capacity']
 def find_slot(map,key,hash_value):
    first_avail = None
    found = False
@@ -54,5 +93,4 @@ def default_compare(key, entry):
 def put(map,key,value):
     hash_value=mf.hash_value(key)
     find_slot(map,key,hash_value)
-    
     
