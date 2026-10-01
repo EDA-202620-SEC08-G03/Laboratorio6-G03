@@ -41,12 +41,13 @@ def size (my_map):
 def get(mapa, key):
     index = hash_value(mapa, key)
     table = mapa["table"]["elements"]
-
-    while table[index] is not None:
+    steps=0
+    while table[index] is not None and steps < mapa["capacity"]:
         entry = table[index]
         if entry["key"] == key:
             return entry["value"]
         index = (index + 1) % mapa["capacity"]
+        steps += 1
 
     return None
 
@@ -60,7 +61,7 @@ def remove(mapa, key):
     while table[index] is not None:
         if table[index]["key"] == key:
             table[index] = None
-            mapa['table']['size'] -= 1
+            mapa['size'] -= 1
             return
         index = (index + 1) % mapa['capacity']
         
@@ -127,17 +128,19 @@ def key_set(map):
     keys = al.new_list()
     for i in range(map["capacity"]):
         entry = al.get_element(map["table"], i)
-        if entry["key"] != "__EMPTY__" and entry["key"] is not None:
+        if entry is not None and entry["key"] is not None and entry["key"] != "__EMPTY__":
             al.add_last(keys, entry["key"])
     return keys
+
 
 def value_set(map):
     values = al.new_list()
     for i in range(map["capacity"]):
         entry = al.get_element(map["table"], i)
-        if entry["key"] != "__EMPTY__" and entry["key"] is not None:
+        if entry is not None and entry["key"] is not None and entry["key"] != "__EMPTY__":
             al.add_last(values, entry["value"])
     return values
+
 
 def hash_value(table, key):
 
@@ -148,3 +151,30 @@ def hash_value(table, key):
     m = table['capacity']
     value = int((abs(h*a + b) % p) % m)
     return value
+
+def contains(map, key):
+    index = hash_value(map, key)
+    table = map["table"]["elements"]
+    steps = 0
+
+    while table[index] is not None and steps < map["capacity"]:
+        entry = table[index]
+        if entry["key"] == key:
+            return True
+        index = (index + 1) % map["capacity"]
+        steps += 1
+
+    return False
+
+def rehash(map):
+    old_table = map["table"]["elements"]
+    old_capacity = map["capacity"]
+
+    new_capacity = mf.next_prime(old_capacity * 2)
+    mapa= new_map(new_capacity, map["limit_factor"], map["prime"])
+
+    for entry in old_table:
+        if entry is not None and entry["key"] is not None and entry["key"] != "__EMPTY__":
+            put(mapa, entry["key"], entry["value"])
+
+    return mapa
