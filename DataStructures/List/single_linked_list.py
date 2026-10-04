@@ -23,9 +23,12 @@ def add_last(lista,element):
     lista["size"]+=1
     lista["last"]=new
     return lista
+
 def size(lista):
     return lista["size"]
+
 def first_element(lista):
+    
     if is_empty(lista):
       raise Exception('IndexError: list index out of range')
     return lista["first"]["info"]

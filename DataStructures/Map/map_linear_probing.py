@@ -1,6 +1,5 @@
 import random
 from DataStructures.Map import map_functions as mf
-from DataStructures.Map import map_separate_chaining as sp
 from DataStructures.List import array_list as al
 
 def new_map (num_elements, load_factor, prime=109345121):
