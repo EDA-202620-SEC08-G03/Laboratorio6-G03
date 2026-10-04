@@ -90,7 +90,7 @@ def insert_element (my_list, element, pos):
 
     return my_list
 def change_info(my_list, pos, new_info):
-    if pos < 0 or pos >= len(my_list["elements"]):
+    if pos < 0 or pos >= size(my_list):
         raise IndexError("list index out of range")
     my_list["elements"][pos] = new_info
     return my_list["elements"][pos]
