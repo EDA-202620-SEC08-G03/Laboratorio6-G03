@@ -208,8 +208,8 @@ def main():
             tiempo_transcurrido = logic.deltaTime(final_tiempo, tiempo_inicio)
             memoria_usada = logic.deltaMemory(memo_inicio, final_memo)
             print_books_by_tag(label, book_list_by_tag)
-            print('Tiempo transcurrido: ' + str(tiempo_transcurrido) + ' ms')
-            print('Memoria usada: ' + str(memoria_usada) + ' kB')
+            print('Tiempo transcurrido: ' + str(round(tiempo_transcurrido, 2)) + ' ms')
+            print('Memoria usada: ' + str(round(memoria_usada, 2)) + ' kB')
                  
         elif int(inputs[0]) == 5:
             author_name = input("Ingrese el nombre del autor que desea buscar:\n")

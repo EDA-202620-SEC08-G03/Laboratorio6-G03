@@ -35,6 +35,9 @@ from DataStructures.Map import map_separate_chaining as sp
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/GoodReads/'
 
+factor_carga = 0.1
+medir_memoria = True
+
 def new_logic():
     """
     Inicializa el catálogo de libros. Crea una lista vacía para guardar
@@ -53,20 +56,20 @@ def new_logic():
 
     #Tabla de Hash que contiene los libros indexados por good_reads_book_id  
     #(good_read_id -> book)
-    catalog['books_by_id'] = lp.new_map(10000, 0.7)
+    catalog['books_by_id'] = lp.new_map(10000, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (author_name -> List(books))
-    catalog['books_by_authors'] = lp.new_map(1000, 0.7)
+    catalog['books_by_authors'] = lp.new_map(1000, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_name -> tag)
-    catalog['tags'] = lp.new_map(1000,0.7)
+    catalog['tags'] = lp.new_map(1000, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_id -> book_tags)
-    catalog['book_tags'] = lp.new_map(1000,0.7)
+    catalog['book_tags'] = lp.new_map(1000, factor_carga)
 
     #Tabla de Hash principal que contiene sub-mapas dentro de los valores
     #con la siguiente representación de la pareja llave valor: (author_name -> (original_publication_year -> list(books)))
-    catalog['books_by_year_author'] = lp.new_map(1000, 0.7)
+    catalog['books_by_year_author'] = lp.new_map(1000, factor_carga)
     
     return catalog
 
@@ -81,17 +84,23 @@ def load_data(catalog):
     """
     
     start_time = getTime()
-    tracemalloc.start()
-    start_memo = getMemory()
+    if medir_memoria is True:
+        tracemalloc.start()
+        start_memo = getMemory()
     
     books, authors = load_books(catalog)
     tag_size = load_tags(catalog)
     book_tag_size = load_books_tags(catalog)
     
     end_time = getTime()
-    end_memo = getMemory()
     deltatime = deltaTime(end_time, start_time)
-    deltamemo = deltaMemory(start_memo, end_memo)
+    deltamemo = 0
+    
+    if medir_memoria is True:
+        end_memo = getMemory()
+        deltamemo = deltaMemory(start_memo, end_memo)
+        tracemalloc.stop()
+    
     return books, authors, tag_size, book_tag_size, deltatime, deltamemo
 
 
@@ -220,7 +229,7 @@ def add_book_author_and_year(catalog, author_name, book):
     else:
         books = al.new_list()
         al.add_last(books, book)
-        pub_year_map = lp.new_map(5, 0.7)
+        pub_year_map = lp.new_map(5, factor_carga)
         lp.put(pub_year_map, pub_year, books)
         lp.put(books_by_year_author, author_name, pub_year_map)
     return catalog
