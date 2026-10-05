@@ -169,7 +169,7 @@ def add_book(catalog, book):
     # Se adiciona el libro a la lista general de libros
     al.add_last(catalog['books'], book)
     # Se adiciona el libro a la tabla de hash indexada por goodreads_book_id
-    lp.put(catalog['books_by_id'],book['goodreads_book_id'], book)
+    sp.put(catalog['books_by_id'],book['goodreads_book_id'], book)
     # Se obtienen los autores del libro
     authors = book['authors'].split(",")
     # Para cada autor, se agrega en la tabla de hash indexada por autores y 
@@ -186,7 +186,7 @@ def add_book_author(catalog, author_name, book):
     a los libros de dicho autor
     """
     authors = catalog['books_by_authors']
-    author_value = lp.get(authors,author_name)
+    author_value = sp.get(authors,author_name)
     if author_value:
         #Si el autor ya se había agregado al mapa, se obtiene la lista que contiene sus libros y se agrega el nuevo elemento.
         al.add_last(author_value,book)
