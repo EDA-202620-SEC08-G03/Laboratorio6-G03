@@ -56,20 +56,20 @@ def new_logic():
 
     #Tabla de Hash que contiene los libros indexados por good_reads_book_id  
     #(good_read_id -> book)
-    catalog['books_by_id'] = sp.new_map(10000, factor_carga)
+    catalog['books_by_id'] = sp.new_map(200, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (author_name -> List(books))
-    catalog['books_by_authors'] = sp.new_map(1000, factor_carga)
+    catalog['books_by_authors'] = sp.new_map(200, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_name -> tag)
-    catalog['tags'] = sp.new_map(1000, factor_carga)
+    catalog['tags'] = sp.new_map(200, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_id -> book_tags)
-    catalog['book_tags'] = sp.new_map(1000, factor_carga)
+    catalog['book_tags'] = sp.new_map(200, factor_carga)
 
     #Tabla de Hash principal que contiene sub-mapas dentro de los valores
     #con la siguiente representación de la pareja llave valor: (author_name -> (original_publication_year -> list(books)))
-    catalog['books_by_year_author'] = sp.new_map(1000, factor_carga)
+    catalog['books_by_year_author'] = sp.new_map(200, factor_carga)
     
     return catalog
 
