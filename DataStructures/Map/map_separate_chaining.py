@@ -108,7 +108,7 @@ def rehash(map):
     num_elements = map["size"]
     load_factor = map["limit_factor"]
 
-    new_capacity = mf.next_prime(int(num_elements / load_factor) + 1)
+    new_capacity = mf.next_prime(map["capacity"]*2)
 
 
     new_table = [sl.new_list() for i in range(new_capacity)]
