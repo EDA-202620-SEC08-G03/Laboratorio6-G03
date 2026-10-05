@@ -36,7 +36,7 @@ from DataStructures.Map import map_separate_chaining as sp
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/GoodReads/'
 
 factor_carga = 0.1
-medir_memoria = True
+medir_memoria = False
 
 def new_logic():
     """
@@ -56,20 +56,20 @@ def new_logic():
 
     #Tabla de Hash que contiene los libros indexados por good_reads_book_id  
     #(good_read_id -> book)
-    catalog['books_by_id'] = lp.new_map(10000, factor_carga)
+    catalog['books_by_id'] = sp.new_map(10000, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (author_name -> List(books))
-    catalog['books_by_authors'] = lp.new_map(1000, factor_carga)
+    catalog['books_by_authors'] = sp.new_map(1000, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_name -> tag)
-    catalog['tags'] = lp.new_map(1000, factor_carga)
+    catalog['tags'] = sp.new_map(1000, factor_carga)
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_id -> book_tags)
-    catalog['book_tags'] = lp.new_map(1000, factor_carga)
+    catalog['book_tags'] = sp.new_map(1000, factor_carga)
 
     #Tabla de Hash principal que contiene sub-mapas dentro de los valores
     #con la siguiente representación de la pareja llave valor: (author_name -> (original_publication_year -> list(books)))
-    catalog['books_by_year_author'] = lp.new_map(1000, factor_carga)
+    catalog['books_by_year_author'] = sp.new_map(1000, factor_carga)
     
     return catalog
 
@@ -195,7 +195,7 @@ def add_book_author(catalog, author_name, book):
         # y como valor una lista que contiene los libros asociados al autor.
         authors_books = al.new_list()
         al.add_last(authors_books,book)
-        lp.put(authors,author_name,authors_books)
+        sp.put(authors,author_name,authors_books)
     return catalog
 
 
@@ -217,21 +217,21 @@ def add_book_author_and_year(catalog, author_name, book):
     if pub_year is None or str(pub_year).strip() in ("", "None"):
         pub_year = "0"
     
-    author_value = lp.get(books_by_year_author,author_name)
+    author_value = sp.get(books_by_year_author,author_name)
     if author_value:
-        pub_year_value = lp.get(author_value,pub_year)
+        pub_year_value = sp.get(author_value,pub_year)
         if pub_year_value:
             al.add_last(pub_year_value,book)
         else:
             books = al.new_list()
             al.add_last(books, book)
-            lp.put(author_value,pub_year,books)
+            sp.put(author_value,pub_year,books)
     else:
         books = al.new_list()
         al.add_last(books, book)
-        pub_year_map = lp.new_map(5, factor_carga)
-        lp.put(pub_year_map, pub_year, books)
-        lp.put(books_by_year_author, author_name, pub_year_map)
+        pub_year_map = sp.new_map(5, factor_carga)
+        sp.put(pub_year_map, pub_year, books)
+        sp.put(books_by_year_author, author_name, pub_year_map)
     return catalog
 
 
@@ -240,7 +240,7 @@ def add_tag(catalog, tag):
     Adiciona un tag al mapa de tags indexado por nombre del tag
     """
     t = new_tag(tag['tag_name'], tag['tag_id'])
-    lp.put(catalog['tags'],tag['tag_name'],t)
+    sp.put(catalog['tags'],tag['tag_name'],t)
     return catalog
 
 
@@ -253,14 +253,14 @@ def add_book_tag(catalog, book_tag):
         - Se crea el nuevo indice en el mapa y como valor se agrega una nueva lista con el book_tag asociado.
     """
     t = new_book_tag(book_tag['tag_id'], book_tag['goodreads_book_id'], book_tag['count'])
-    book_tag_value = lp.contains(catalog['book_tags'],t['tag_id'])
+    book_tag_value = sp.contains(catalog['book_tags'],t['tag_id'])
     if book_tag_value:
-        book_tag_list = lp.get(catalog['book_tags'],t['tag_id'])
+        book_tag_list = sp.get(catalog['book_tags'],t['tag_id'])
         al.add_last(book_tag_list,book_tag)
     else:
         book_tag_list = al.new_list()
         al.add_last(book_tag_list, book_tag)
-        lp.put(catalog["book_tags"], t["tag_id"], book_tag_list) 
+        sp.put(catalog["book_tags"], t["tag_id"], book_tag_list) 
     return catalog
 
 #  -------------------------------------------------------------
@@ -272,7 +272,7 @@ def get_book_info_by_book_id(catalog, good_reads_book_id):
     Retorna toda la informacion que se tenga almacenada de un libro según su good_reads_id.
     """
 
-    libro = lp.get(catalog["books"], str(good_reads_book_id))
+    libro = sp.get(catalog["books"], str(good_reads_book_id))
     
     return libro  
 
@@ -282,7 +282,7 @@ def get_books_by_author(catalog, author_name):
     """
     
     lista_libros = al.new_list()
-    mapa_añoautor = lp.get(catalog["books_by_year_author"], author_name)
+    mapa_añoautor = sp.get(catalog["books_by_year_author"], author_name)
     if mapa_añoautor:
         tabla = mapa_añoautor["table"]
         for i in range(1, al.size(tabla) + 1):
@@ -308,17 +308,17 @@ def get_books_by_tag(catalog, tag_name):
 
     """
     librosencontrados = al.new_list()
-    tag = lp.get(catalog["tags"], tag_name)
+    tag = sp.get(catalog["tags"], tag_name)
     if tag:
         tag_id = tag["tag_id"]
-        lista_taglibros = lp.get(catalog["book_tags"], tag_id)
+        lista_taglibros = sp.get(catalog["book_tags"], tag_id)
         if lista_taglibros:
             for i in range(1, al.size(lista_taglibros) + 1):
                 libro_tag = al.get_element(lista_taglibros, i)
                 libro_id = libro_tag["goodreads_book_id"]
-                libro = lp.get(catalog["books"], str(libro_id))
+                libro = sp.get(catalog["books"], str(libro_id))
                 if not libro:
-                    libro = lp.get(catalog["books"], int(libro_id))
+                    libro = sp.get(catalog["books"], int(libro_id))
                 if libro:
                     al.add_last(librosencontrados, libro)
                 
@@ -342,9 +342,9 @@ def get_books_by_author_pub_year(catalog, author_name, pub_year):
     if pub_year is None or str(pub_year).strip() in ("", "None"):
         pub_year = "0"
         
-    mapa_autor = lp.get(catalog["books_by_year_author"], author_name)
+    mapa_autor = sp.get(catalog["books_by_year_author"], author_name)
     if mapa_autor:
-        resultado = lp.get(mapa_autor, pub_year)
+        resultado = sp.get(mapa_autor, pub_year)
     else:
         resultado = None
             
@@ -364,19 +364,19 @@ def get_books_by_author_pub_year(catalog, author_name, pub_year):
 #  -------------------------------------------------------------
 
 def book_size(catalog):
-    return lp.size(catalog['books_by_id'])
+    return sp.size(catalog['books_by_id'])
 
 
 def author_size(catalog):
-    return lp.size(catalog['books_by_authors'])
+    return sp.size(catalog['books_by_authors'])
 
 
 def tag_size(catalog):
-    return lp.size(catalog['tags'])
+    return sp.size(catalog['tags'])
 
 
 def book_tag_size(catalog):
-    return lp.size(catalog['book_tags'])
+    return sp.size(catalog['book_tags'])
 
 #  -------------------------------------------------------------
 # Funciones utilizadas para obtener memoria y tiempo
