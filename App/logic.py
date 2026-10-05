@@ -35,8 +35,8 @@ from DataStructures.Map import map_separate_chaining as sp
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/GoodReads/'
 
-factor_carga = 0.1
-medir_memoria = False
+factor_carga = 8.0
+medir_memoria = True
 
 def new_logic():
     """
